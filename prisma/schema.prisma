@@ -1,0 +1,78 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Table {
+  id Int @id @default(autoincrement())
+  number Int @unique
+  capacity Int
+  active Boolean @default(true)
+
+  bookings Booking[]
+}
+
+enum BookingStatus {
+  CONFIRMED
+  CANCELLED
+}
+
+enum BookingSource {
+  ONLINE
+  STAFF
+}
+
+model Booking {
+  id        Int      @id @default(autoincrement())
+  reference String   @unique 
+
+  // ONLINE bookings (your current fields)
+  email     String?      // <- now optional
+  firstName String?      // <- now optional
+  surname   String?      // <- now optional
+
+  // STAFF bookings (single free-text name)
+  customerName String?   // <- e.g. "John Murphy" or "Murphy" or whatever they type
+
+  partySize Int
+  startTime DateTime
+  endTime   DateTime
+  createdAt DateTime @default(now())
+
+  status BookingStatus @default(CONFIRMED)
+  source BookingSource @default(ONLINE)
+
+  phone String?          // optional
+  notes String?          // optional
+
+  tableId Int
+  table   Table @relation(fields: [tableId], references: [id])
+
+  @@index([startTime])
+  @@index([source, startTime])
+}
+
+
+model IdempotencyKey {
+  id            String   @id @default(cuid())
+  key           String
+  route         String
+  responseCode  Int
+  responseBody  Json
+  createdAt     DateTime @default(now())
+
+  @@unique([key, route])
+  @@index([createdAt])
+}
+
+
+

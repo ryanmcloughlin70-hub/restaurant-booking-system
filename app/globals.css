@@ -24,3 +24,15 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Staff dashboard only: make calendar icon white */
+.staff-dashboard input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+  cursor: pointer;
+}
+
+.staff-dashboard input[type="date"].date-icon-black::-webkit-calendar-picker-indicator {
+  filter: invert(0);
+}
+
+
