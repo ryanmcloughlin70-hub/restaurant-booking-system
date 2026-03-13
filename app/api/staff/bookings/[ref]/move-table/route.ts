@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { Prisma } from "@prisma/client";
 import { getPrisma } from "@/app/lib/prisma";
 import { requireStaff } from "@/app/lib/staffAuth";
 
@@ -66,7 +67,7 @@ export async function POST(
   }
 
   // ✅ Transaction + lock target table + overlap check excluding this booking
-  const updated = await prisma.$transaction(async (tx) => {
+  const updated = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
     await tx.$queryRaw`SELECT id FROM "Table" WHERE id = ${target.id} FOR UPDATE`;
 
     const overlap = await tx.booking.findFirst({

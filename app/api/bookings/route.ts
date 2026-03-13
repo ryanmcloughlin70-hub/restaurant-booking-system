@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { Prisma } from "@prisma/client";
 import { getPrisma } from "@/app/lib/prisma";
 import { sendBookingConfirmationEmail } from "@/app/lib/email";
 import type { Prisma } from "@prisma/client";
@@ -175,7 +176,7 @@ export async function POST(req: Request) {
     // -------------------------------
     // ✅ Race-safe table selection + booking create (transaction + row locks)
     // -------------------------------
-    const booking = await prisma.$transaction(async (tx) => {
+    const booking = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       // 1) Get candidates (smallest table first, then lowest number)
       const candidates = await tx.table.findMany({
         where: {

@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { assignTableForSlot } from "@/lib/assignTableForSlot";
 import { sendBookingModifiedEmail } from "@/lib/email";
@@ -111,7 +112,7 @@ export async function POST(
   }
 
   // IMPORTANT: don't type tx as PrismaClient (causes overload mismatch with your adapter setup)
-  const result = await prisma.$transaction(async (tx) => {
+  const result = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
     await tx.booking.update({
       where: { reference },
       data: { status: "CANCELLED" },

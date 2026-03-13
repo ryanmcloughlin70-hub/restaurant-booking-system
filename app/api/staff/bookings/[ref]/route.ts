@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { Prisma } from "@prisma/client";
 import { getPrisma } from "@/app/lib/prisma";
 import { requireStaff } from "@/app/lib/staffAuth";
 import { assignTableForSlot } from "@/app/lib/assignTableForSlot";
@@ -316,21 +317,21 @@ export async function PATCH(
           suggestions: {
             nearest: nearest
               ? {
-                  startTime: nearest.startTime.toISOString(),
-                  endTime: nearest.endTime.toISOString(),
-                  tableId: nearest.table.id,
-                  tableNumber: nearest.table.number,
-                  tableCapacity: nearest.table.capacity,
-                }
+                startTime: nearest.startTime.toISOString(),
+                endTime: nearest.endTime.toISOString(),
+                tableId: nearest.table.id,
+                tableNumber: nearest.table.number,
+                tableCapacity: nearest.table.capacity,
+              }
               : null,
             nextEarliest: nextEarliest
               ? {
-                  startTime: nextEarliest.startTime.toISOString(),
-                  endTime: nextEarliest.endTime.toISOString(),
-                  tableId: nextEarliest.table.id,
-                  tableNumber: nextEarliest.table.number,
-                  tableCapacity: nextEarliest.table.capacity,
-                }
+                startTime: nextEarliest.startTime.toISOString(),
+                endTime: nextEarliest.endTime.toISOString(),
+                tableId: nextEarliest.table.id,
+                tableNumber: nextEarliest.table.number,
+                tableCapacity: nextEarliest.table.capacity,
+              }
               : null,
           },
         },
@@ -342,7 +343,7 @@ export async function PATCH(
   }
 
   // ✅ Transaction + lock chosen table row + overlap re-check excluding this booking
-  const updated = await prisma.$transaction(async (tx) => {
+  const updated = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
     await tx.$queryRaw`SELECT id FROM "Table" WHERE id = ${chosenTableId} FOR UPDATE`;
 
     const overlap = await tx.booking.findFirst({
