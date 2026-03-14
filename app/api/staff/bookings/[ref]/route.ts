@@ -222,12 +222,17 @@ export async function PATCH(
   }
 
   // Build proposed updates (keep old values if not provided)
-  const nextEmail =
-    body.email === undefined ? existing.email : String(body.email ?? "").trim().toLowerCase();
-  const nextFirstName =
-    body.firstName === undefined ? existing.firstName : String(body.firstName ?? "").trim();
-  const nextSurname =
-    body.surname === undefined ? existing.surname : String(body.surname ?? "").trim();
+  const nextEmail = String(
+    body.email === undefined ? (existing.email ?? "") : body.email ?? ""
+  ).trim().toLowerCase();
+
+  const nextFirstName = String(
+    body.firstName === undefined ? (existing.firstName ?? "") : body.firstName ?? ""
+  ).trim();
+
+  const nextSurname = String(
+    body.surname === undefined ? (existing.surname ?? "") : body.surname ?? ""
+  ).trim();
 
   const nextPartySize =
     body.partySize === undefined ? existing.partySize : Number(body.partySize);

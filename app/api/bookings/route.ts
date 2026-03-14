@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { Prisma } from "@prisma/client";
 import { getPrisma } from "@/app/lib/prisma";
 import { sendBookingConfirmationEmail } from "@/app/lib/email";
 import type { Prisma } from "@prisma/client";
@@ -248,22 +247,24 @@ export async function POST(req: Request) {
       return NextResponse.json(responseBody, { status: 409 });
     }
 
-    // Email sending (won't work to non-account addresses until domain verified)
-    try {
-      await sendBookingConfirmationEmail({
-        to: booking.email,
-        firstName: booking.firstName,
-        reference: booking.reference,
-        partySize: booking.partySize,
-        startTime: booking.startTime,
-        endTime: booking.endTime,
-        tableNumber: booking.table.number,
-        restaurantName: "Mahon's Hotel",
-        phone: "028 6862 1656",
-        addressLine: "Irvinestown, Co. Fermanagh",
-      });
-    } catch (emailErr) {
-      console.error("Booking email failed:", emailErr);
+        // Email sending (won't work to non-account addresses until domain verified)
+    if (booking.email) {
+      try {
+        await sendBookingConfirmationEmail({
+          to: booking.email,
+          firstName: booking.firstName ?? booking.customerName ?? "Customer",
+          reference: booking.reference,
+          partySize: booking.partySize,
+          startTime: booking.startTime,
+          endTime: booking.endTime,
+          tableNumber: booking.table.number,
+          restaurantName: "Mahon's Hotel",
+          phone: "028 6862 1656",
+          addressLine: "Irvinestown, Co. Fermanagh",
+        });
+      } catch (emailErr) {
+        console.error("Booking email failed:", emailErr);
+      }
     }
 
     const responseBody = { ok: true, booking };
